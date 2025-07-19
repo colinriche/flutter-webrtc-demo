@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../utils/screen_select_dialog.dart';
 import 'random_string.dart';
@@ -49,7 +50,7 @@ class Signaling {
   SimpleWebSocket? _socket;
   BuildContext? _context;
   var _host;
-  var _port = 8086;
+  var _port = 3000; // Alternative port that's less likely to be blocked
   var _turnCredential;
   Map<String, Session> _sessions = {};
   MediaStream? _localStream;
@@ -72,6 +73,8 @@ class Signaling {
   Map<String, dynamic> _iceServers = {
     'iceServers': [
       {'url': 'stun:stun.l.google.com:19302'},
+      // For local development, you can add a local STUN server if needed
+      // {'url': 'stun:192.168.1.156:3478'},
       /*
        * turn server configuration example.
       {
@@ -283,21 +286,18 @@ class Signaling {
   }
 
   Future<void> connect() async {
-    var url = 'https://$_host:$_port/ws';
+    // var url = 'https://$_host:$_port/ws'; // SSL
+    var url = 'http://$_host:$_port'; // local websocket
     _socket = SimpleWebSocket(url);
 
     print('connect to $url');
 
+    // For local development, skip TURN server configuration
+    // Uncomment the following block if you have a local TURN server
+    /*
     if (_turnCredential == null) {
       try {
         _turnCredential = await getTurnCredential(_host, _port);
-        /*{
-            "username": "1584195784:mbzrxpgjys",
-            "password": "isyl6FF6nqMTB9/ig5MrMRUXqZg",
-            "ttl": 86400,
-            "uris": ["turn:127.0.0.1:19302?transport=udp"]
-          }
-        */
         _iceServers = {
           'iceServers': [
             {
@@ -307,8 +307,11 @@ class Signaling {
             },
           ]
         };
-      } catch (e) {}
+      } catch (e) {
+        print('TURN server not available, using STUN only');
+      }
     }
+    */
 
     _socket?.onOpen = () {
       print('onOpen');

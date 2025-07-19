@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+</head>
+<body>
+    <h1>WebSocket Connection Test</h1>
+    <div id="status">Connecting...</div>
+    <div id="messages"></div>
+
+    <script>
+        const statusDiv = document.getElementById('status');
+        const messagesDiv = document.getElementById('messages');
+        
+        // Use the computer's IP address
+        const host = '192.168.1.156'; // Your computer's IP address
+        const port = 3000;
+        const wsUrl = `ws://${host}:${port}`;
+        
+        statusDiv.textContent = `Connecting to ${wsUrl}...`;
+        
+        const ws = new WebSocket(wsUrl);
+        
+        ws.onopen = function(event) {
+            statusDiv.textContent = 'Connected!';
+            statusDiv.style.color = 'green';
+            
+            // Send a test message
+            const testMessage = {
+                type: 'new',
+                data: {
+                    id: 'test-client-' + Date.now(),
+                    name: 'Test Client',
+                    user_agent: 'Test Browser'
+                }
+            };
+            ws.send(JSON.stringify(testMessage));
+        };
+        
+        ws.onmessage = function(event) {
+            const message = JSON.parse(event.data);
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = `Received: ${JSON.stringify(message)}`;
+            messagesDiv.appendChild(messageDiv);
+        };
+        
+        ws.onclose = function(event) {
+            statusDiv.textContent = `Connection closed: ${event.code} - ${event.reason}`;
+            statusDiv.style.color = 'red';
+        };
+        
+        ws.onerror = function(error) {
+            statusDiv.textContent = 'Connection error!';
+            statusDiv.style.color = 'red';
+            console.error('WebSocket error:', error);
+        };
+    </script>
+</body>
+</html> 

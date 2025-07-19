@@ -63,7 +63,8 @@ class _MyAppState extends State<MyApp> {
   _initData() async {
     _prefs = await SharedPreferences.getInstance();
     setState(() {
-      _server = _prefs.getString('server') ?? 'demo.cloudwebrtc.com';
+      _server = _prefs.getString('server') ?? '192.168.1.156';  // <== your laptop IP
+      // _server = _prefs.getString('server') ?? 'demo.cloudwebrtc.com';
     });
   }
 

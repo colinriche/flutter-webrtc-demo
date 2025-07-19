@@ -9,7 +9,7 @@ class SimpleWebSocket {
   Function(int code, String reason)? onClose;
 
   SimpleWebSocket(this._url) {
-    _url = _url.replaceAll('https:', 'wss:');
+    _url = _url.replaceAll('https:', 'wss:').replaceAll('http:', 'ws:');
   }
 
   connect() async {

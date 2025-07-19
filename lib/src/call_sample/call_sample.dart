@@ -23,6 +23,7 @@ class _CallSampleState extends State<CallSample> {
   Session? _session;
   DesktopCapturerSource? selected_source_;
   bool _waitAccept = false;
+  String _connectionStatus = 'Connecting...';
 
   // ignore: unused_element
   _CallSampleState();
@@ -50,10 +51,29 @@ class _CallSampleState extends State<CallSample> {
   void _connect(BuildContext context) async {
     _signaling ??= Signaling(widget.host, context)..connect();
     _signaling?.onSignalingStateChange = (SignalingState state) {
+      print('Signaling state changed: $state');
+      setState(() {
+        switch (state) {
+          case SignalingState.ConnectionClosed:
+            _connectionStatus = 'Connection closed';
+            break;
+          case SignalingState.ConnectionError:
+            _connectionStatus = 'Connection error';
+            break;
+          case SignalingState.ConnectionOpen:
+            _connectionStatus = 'Connected';
+            break;
+        }
+      });
       switch (state) {
         case SignalingState.ConnectionClosed:
+          print('Connection closed');
+          break;
         case SignalingState.ConnectionError:
+          print('Connection error');
+          break;
         case SignalingState.ConnectionOpen:
+          print('Connection opened successfully');
           break;
       }
     };
@@ -290,6 +310,18 @@ class _CallSampleState extends State<CallSample> {
             tooltip: 'setup',
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(30.0),
+          child: Container(
+            color: Colors.blue,
+            padding: EdgeInsets.symmetric(vertical: 5.0),
+            child: Text(
+              'Status: $_connectionStatus',
+              style: TextStyle(color: Colors.white, fontSize: 12.0),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: _inCalling
@@ -351,13 +383,33 @@ class _CallSampleState extends State<CallSample> {
                 ]),
               );
             })
-          : ListView.builder(
-              shrinkWrap: true,
-              padding: const EdgeInsets.all(0.0),
-              itemCount: (_peers != null ? _peers.length : 0),
-              itemBuilder: (context, i) {
-                return _buildRow(context, _peers[i]);
-              }),
+          : _peers.isEmpty 
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('No peers available'),
+                      SizedBox(height: 10),
+                      Text('Server: ${widget.host}:3000'),
+                      SizedBox(height: 10),
+                      Text('Status: $_connectionStatus'),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          _signaling?.connect();
+                        },
+                        child: Text('Retry Connection'),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.all(0.0),
+                  itemCount: (_peers != null ? _peers.length : 0),
+                  itemBuilder: (context, i) {
+                    return _buildRow(context, _peers[i]);
+                  }),
     );
   }
 }

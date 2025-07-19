@@ -1,0 +1,15 @@
+{
+  "name": "flutter-webrtc-local-server",
+  "version": "1.0.0",
+  "description": "Local WebSocket server for Flutter WebRTC testing",
+  "main": "websocket-server-3000.js",
+  "scripts": {
+    "start": "node websocket-server-3000.js"
+  },
+  "dependencies": {
+    "ws": "^8.13.0"
+  },
+  "keywords": ["webrtc", "websocket", "flutter"],
+  "author": "",
+  "license": "MIT"
+} 
