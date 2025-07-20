@@ -25,6 +25,8 @@
    - Grant camera/microphone permissions when prompted
 
 use 2 phones
+or flutter run -d chrome
+to run in the browser
 
 ## Troubleshooting
 - If connection fails, check Windows Firewall allows port 3000
